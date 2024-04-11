@@ -8,6 +8,7 @@ def transformer(bad_date):
 
 
 day_1 = datetime.datetime(2020, 3, 1)
+print(day_1)
 type_room = {'one': 2900, 'two': 2300, 'middle_luxe': 3200, 'luxe': 4100}
 coefficient = {'standart': 1, 'improve_standart': 1.2, 'apartment': 1.5}
 food = {'without' : 0, 'breakfast' : 280, 'half_board': 1000}
@@ -32,7 +33,7 @@ with open('fund.txt', encoding= 'utf-8') as chrt:
             line = line.replace('апартамент', 'apartment')
         line = line.split()
         fund_dict[line[0]] = [line[1], int(line[2]), line[3]]
-    print(fund_dict)
+    #print(fund_dict)
 
 with open('booking.txt', encoding='utf-8') as clients:
     first_client = clients.readline()
@@ -51,7 +52,9 @@ matrix[:, 0] = np.vectorize(transformer)(matrix[:, 0])
 matrix[:, 5] = np.vectorize(transformer)(matrix[:, 5])
 print(matrix)
 
+day_1 = datetime.datetime.strptime(matrix[0][0], '%Y-%m-%d')
 days = []
+
 for i in range(31):
     days.append(str((day_1 + datetime.timedelta(i)).date()))
 print(days)
