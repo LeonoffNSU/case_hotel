@@ -57,4 +57,6 @@ days = []
 
 for i in range(31):
     days.append(str((day_1 + datetime.timedelta(i)).date()))
-print(days)
+
+busy = {i: dict.fromkeys(days, 0) for i in range(1, 25)}
+print(busy)
