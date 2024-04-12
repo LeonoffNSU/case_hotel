@@ -15,7 +15,7 @@ def free_room(bussy: dict):
     return free_rooms
 
 
-def suitable_quantity_filter(numbers: dict, requirement: np.str_ = None):
+def suitable_quantity_filter(numbers: dict, requirement: np.str_):
     requirement = int(requirement)
     output_numbers = {}
 
@@ -24,6 +24,24 @@ def suitable_quantity_filter(numbers: dict, requirement: np.str_ = None):
             output_numbers[number] = numbers[number]
 
     return output_numbers
+
+
+def future_busy(free_rooms: dict, entry_date: np.str_, amount_days: np.str_):
+    entry_day = np.datetime64(entry_date)
+    stay_dates = []
+    for day in range(int(amount_days)):
+        delta = np.timedelta64(day, 'D')
+        stay_dates.append(np.str_(entry_day + delta))
+
+    final_rooms = {}
+    for room in free_rooms:
+        flag = True
+        for date in stay_dates:
+            if busy[date][room] == 1:
+                flag = False
+        if flag:
+            final_rooms[room] = 0
+    return final_rooms
 
 
 type_room = {'one': 2900, 'two': 2300, 'middle_luxe': 3200, 'luxe': 4100}
@@ -91,12 +109,9 @@ for clt in matrix:
     free_numbers = busy[date_entry]
     print(free_numbers)
     free_numbers = free_room(free_numbers)
-    free_numbers = suitable_quantity_filter(numbers=free_numbers, requirement=clt[4])
+    free_numbers = suitable_quantity_filter(free_numbers, clt[4])
+    free_numbers = future_busy(free_numbers, date_entry, clt[6])
     print(free_numbers)
     break
-
-
-
-
 
 
