@@ -7,6 +7,14 @@ def transformer(bad_date):
     return good_date
 
 
+def free_room(bussy: dict):
+    free_rooms = {}
+    for room, free in bussy.items():
+        if free == 0:
+            free_rooms[room] = free
+    return free_rooms
+
+
 type_room = {'one': 2900, 'two': 2300, 'middle_luxe': 3200, 'luxe': 4100}
 coefficient = {'standart': 1, 'improve_standart': 1.2, 'apartment': 1.5}
 food = {'without': 0, 'breakfast': 280, 'half_board': 1000}
@@ -65,9 +73,14 @@ busy = {}
 number_of_room = len(fund_dict)
 numbers = [np.str_(num) for num in range(1, number_of_room+1)]
 
-
 busy = {day: dict.fromkeys(numbers, 0) for day in days}
 print(busy)
+
+
+
+print(free_room(busy))
+
+
 
 
 
