@@ -8,10 +8,9 @@ def transformer(bad_date):
 
 
 day_1 = datetime.datetime(2020, 3, 1)
-print(day_1)
 type_room = {'one': 2900, 'two': 2300, 'middle_luxe': 3200, 'luxe': 4100}
 coefficient = {'standart': 1, 'improve_standart': 1.2, 'apartment': 1.5}
-food = {'without' : 0, 'breakfast' : 280, 'half_board': 1000}
+food = {'without': 0, 'breakfast': 280, 'half_board': 1000}
 
 
 with open('fund.txt', encoding= 'utf-8') as chrt:
@@ -33,7 +32,12 @@ with open('fund.txt', encoding= 'utf-8') as chrt:
             line = line.replace('апартамент', 'apartment')
         line = line.split()
         fund_dict[line[0]] = [line[1], int(line[2]), line[3]]
-    #print(fund_dict)
+    print(fund_dict)
+
+for key in fund_dict:
+    coeff = fund_dict[key][2]
+    tp_room = fund_dict[key][0]
+    fund_dict[key].append(type_room[tp_room]*coefficient[coeff])
 
 with open('booking.txt', encoding='utf-8') as clients:
     first_client = clients.readline()
@@ -56,7 +60,16 @@ day_1 = datetime.datetime.strptime(matrix[0][0], '%Y-%m-%d')
 days = []
 
 for i in range(31):
-    days.append(str((day_1 + datetime.timedelta(i)).date()))
+    days.append(np.str_((day_1 + datetime.timedelta(i)).date()))
 
-busy = {i: dict.fromkeys(days, 0) for i in range(1, 25)}
+busy = {}
+number_of_room = len(fund_dict)
+numbers = [np.str_(num) for num in range(1, number_of_room+1)]
+
+
+busy = {day: dict.fromkeys(numbers, 0) for day in days}
 print(busy)
+
+
+
+
