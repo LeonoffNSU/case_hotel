@@ -15,7 +15,6 @@ def free_room(bussy: dict):
     return free_rooms
 
 
-#%%
 def suitable_quantity_filter(numbers: dict, requirement: np.str_ = None):
     requirement = int(requirement)
     output_numbers = {}
@@ -75,13 +74,12 @@ matrix[:, 0] = np.vectorize(transformer)(matrix[:, 0])
 matrix[:, 5] = np.vectorize(transformer)(matrix[:, 5])
 print(matrix)
 
-day_1 = datetime.datetime.strptime(matrix[0][0], '%Y-%m-%d')
+day_1 = np.datetime64(matrix[0][0])
 days = []
 
 for i in range(31):
-    days.append(np.str_((day_1 + datetime.timedelta(i)).date()))
+    days.append(np.str_(day_1 + np.timedelta64(i, 'D')))
 
-busy = {}
 number_of_room = len(fund_dict)
 numbers = [np.str_(num) for num in range(1, number_of_room+1)]
 
