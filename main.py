@@ -15,6 +15,18 @@ def free_room(bussy: dict):
     return free_rooms
 
 
+#%%
+def suitable_quantity_filter(numbers: dict, requirement: np.str_ = None):
+    requirement = int(requirement)
+    output_numbers = {}
+
+    for number in numbers:
+        if fund_dict[number][1] == requirement:
+            output_numbers[number] = numbers[number]
+
+    return output_numbers
+
+
 type_room = {'one': 2900, 'two': 2300, 'middle_luxe': 3200, 'luxe': 4100}
 coefficient = {'standart': 1, 'improve_standart': 1.2, 'apartment': 1.5}
 food = {'without': 0, 'breakfast': 280, 'half_board': 1000}
@@ -76,9 +88,14 @@ numbers = [np.str_(num) for num in range(1, number_of_room+1)]
 busy = {day: dict.fromkeys(numbers, 0) for day in days}
 print(busy)
 
-
-
-print(free_room(busy))
+for clt in matrix:
+    date_entry = clt[5]
+    free_numbers = busy[date_entry]
+    print(free_numbers)
+    free_numbers = free_room(free_numbers)
+    free_numbers = suitable_quantity_filter(numbers=free_numbers, requirement=clt[4])
+    print(free_numbers)
+    break
 
 
 
