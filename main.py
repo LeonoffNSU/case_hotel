@@ -6,6 +6,13 @@ def transformer(bad_date):
     good_date = bad_date[-4:] + '-' + bad_date[-7:-5] + '-' + bad_date[0:2]
     return good_date
 
+def filter_cost(rooms: dict, requirement: np.str_):
+    requirement = int(requirement)
+    cost = {}
+    for room in rooms.keys():
+        if requirement >= fund_dict[room][3]:
+            cost[room] = rooms[room]
+    return cost
 
 def free_room(bussy: dict):
     free_rooms = {}
@@ -104,14 +111,18 @@ numbers = [np.str_(num) for num in range(1, number_of_room+1)]
 busy = {day: dict.fromkeys(numbers, 0) for day in days}
 print(busy)
 
+
 for clt in matrix:
     date_entry = clt[5]
     free_numbers = busy[date_entry]
-    print(free_numbers)
-    free_numbers = free_room(free_numbers)
+    max_costs = clt[7]
+    free_numbers = filter_cost(free_numbers, max_costs)
+    #free_numbers = free_room(free_numbers)
     free_numbers = suitable_quantity_filter(free_numbers, clt[4])
     free_numbers = future_busy(free_numbers, date_entry, clt[6])
     print(free_numbers)
     break
+
+
 
 
