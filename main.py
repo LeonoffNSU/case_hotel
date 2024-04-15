@@ -1,10 +1,10 @@
 import numpy as np
-import datetime
 
 
 def transformer(bad_date):
     good_date = bad_date[-4:] + '-' + bad_date[-7:-5] + '-' + bad_date[0:2]
     return good_date
+
 
 def filter_cost(rooms: dict, requirement: np.str_):
     requirement = int(requirement)
@@ -14,6 +14,7 @@ def filter_cost(rooms: dict, requirement: np.str_):
             cost[room] = rooms[room]
     return cost
 
+
 def free_room(bussy: dict):
     free_rooms = {}
     for room, free in bussy.items():
@@ -22,10 +23,8 @@ def free_room(bussy: dict):
     return free_rooms
 
 
-def suitable_quantity_filter(numbers: dict, requirement: np.str_):
-    requirement = int(requirement)
+def suitable_quantity_filter(numbers: dict, requirement: int):
     output_numbers = {}
-
     for number in numbers:
         if fund_dict[number][1] == requirement:
             output_numbers[number] = numbers[number]
@@ -75,12 +74,13 @@ with open('fund.txt', encoding= 'utf-8') as chrt:
             line = line.replace('апартамент', 'apartment')
         line = line.split()
         fund_dict[line[0]] = [line[1], int(line[2]), line[3]]
-    print(fund_dict)
 
 for key in fund_dict:
     coeff = fund_dict[key][2]
     tp_room = fund_dict[key][0]
     fund_dict[key].append(type_room[tp_room]*coefficient[coeff])
+print(fund_dict)
+
 
 with open('booking.txt', encoding='utf-8') as clients:
     first_client = clients.readline()
@@ -116,10 +116,22 @@ for clt in matrix:
     date_entry = clt[5]
     free_numbers = busy[date_entry]
     max_costs = clt[7]
+    amount = int(clt[4])
     free_numbers = filter_cost(free_numbers, max_costs)
-    #free_numbers = free_room(free_numbers)
-    free_numbers = suitable_quantity_filter(free_numbers, clt[4])
     free_numbers = future_busy(free_numbers, date_entry, clt[6])
+    free_numbers = suitable_quantity_filter(free_numbers, amount)
+    if len(free_numbers) == 0:
+        if amount < 6:
+            for i in range(1, 7 - amount):
+                if len(free_numbers) == 0:
+                    free_numbers = suitable_quantity_filter(free_numbers, amount+i)
+        else:
+            print('Not free')
+    max_cost = max(fund_dict[key][3] for key in free_numbers.keys())
+    print(max_cost)
+
+
+
     print(free_numbers)
     break
 
