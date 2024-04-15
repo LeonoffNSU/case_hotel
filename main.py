@@ -97,7 +97,7 @@ with open('booking.txt', encoding='utf-8') as clients:
 
 matrix[:, 0] = np.vectorize(transformer)(matrix[:, 0])
 matrix[:, 5] = np.vectorize(transformer)(matrix[:, 5])
-print(matrix)
+#print(matrix)
 
 day_1 = np.datetime64(matrix[0][0])
 days = []
@@ -109,29 +109,45 @@ number_of_room = len(fund_dict)
 numbers = [np.str_(num) for num in range(1, number_of_room+1)]
 
 busy = {day: dict.fromkeys(numbers, 0) for day in days}
-print(busy)
+#print(busy)
 
 
 for clt in matrix:
     date_entry = clt[5]
+    print(clt[1])
     free_numbers = busy[date_entry]
     max_costs = clt[7]
     amount = int(clt[4])
+    print(free_numbers, 'до фильтров')
     free_numbers = filter_cost(free_numbers, max_costs)
+    print(free_numbers, 'по цене и занятости на будущие даты')
     free_numbers = future_busy(free_numbers, date_entry, clt[6])
+    check_free_numbers = free_numbers.copy()
+
     free_numbers = suitable_quantity_filter(free_numbers, amount)
     if len(free_numbers) == 0:
         if amount < 6:
             for i in range(1, 7 - amount):
-                if len(free_numbers) == 0:
-                    free_numbers = suitable_quantity_filter(free_numbers, amount+i)
+                free_numbers = check_free_numbers
+                free_numbers = suitable_quantity_filter(free_numbers, amount + i)
+                print(amount + i)
+                if len(free_numbers) != 0:
+                    break
+                if amount + i == 6:
+                    print('Not free1')
+
         else:
             print('Not free')
-    max_cost = max(fund_dict[key][3] for key in free_numbers.keys())
-    print(max_cost)
 
+    if len(free_numbers) != 0:
+        max_cost = max(fund_dict[key][3] for key in free_numbers.keys())
+        for room in free_numbers:
+            if fund_dict[room][1] != amount:
+                max_cost = max_cost * 0.7
+                break
 
-
+        print(max_cost)
+        print(free_numbers)
     print(free_numbers)
     break
 
