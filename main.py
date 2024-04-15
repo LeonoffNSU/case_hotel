@@ -179,22 +179,24 @@ for clt in matrix:
     if len(free_numbers) == 0:      #!!!
         flag_string = 'empty'
 
-    while amount <= 6:
-        if len(suitable_quantity_filter(free_numbers, amount)) != 0:
-            free_numbers = suitable_quantity_filter(free_numbers, amount)
-            break
-        else:
-            amount += 1
+    if flag_string == 'content':
+        while amount <= 6:
+            if len(suitable_quantity_filter(free_numbers, amount)) != 0:
+                free_numbers = suitable_quantity_filter(free_numbers, amount)
+                break
+            else:
+                amount += 1
 
-    if amount == 7:
-        free_numbers = {}
-        flag_string = 'empty'
-    print(free_numbers, 'по нужному количеству человек')        # второй фильтр применен
+        if amount == 7:
+            free_numbers = {}
+            flag_string = 'empty'
+        print(free_numbers, 'по нужному количеству человек')        # второй фильтр применен
 
-    free_numbers = filter_cost(free_numbers, max_clt_cost, amount)
-    print(free_numbers, 'по цене')
-    if len(free_numbers) == 0:      #!!! x2
-        flag_string = 'empty'
+    if flag_string == 'content':
+        free_numbers = filter_cost(free_numbers, max_clt_cost, amount)
+        print(free_numbers, 'по цене')          # третий фильтр применен
+        if len(free_numbers) == 0:      #!!! x2
+            flag_string = 'empty'
 
     if flag_string == 'content':
         # подсчитать профит (сделано, реализовал функцию profit)
