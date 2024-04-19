@@ -6,6 +6,20 @@ def transformer(bad_date):
     return good_date
 
 
+def busy_cnt(rooms: dict):
+    cnt = 0
+    for room, value in rooms.items():
+        if value == 1:
+            cnt += 1
+    return cnt
+
+
+def busy_categories(rooms: dict):
+    new_rooms = {}
+    for room in rooms:
+        if True:
+            pass
+
 def filter_cost(rooms: dict, opportunity: np.str_, arg_amount: int):
     opportunity = int(opportunity)
     cost = {}
@@ -62,6 +76,7 @@ def profit(good_rooms: dict, opportunity: np.str_, arg_amount: int):
         with_breakfast = list_for_max + food['breakfast']
         with_half_board = list_for_max + food['half_board']
         table_for_max = np.vstack([list_for_max, with_breakfast, with_half_board])
+        #print(table_for_max)
 
         potential_max = table_for_max.max()
         while opportunity < potential_max:
@@ -152,7 +167,6 @@ with open('booking.txt', encoding='utf-8') as clients:
 
 matrix[:, 0] = np.vectorize(transformer)(matrix[:, 0])
 matrix[:, 5] = np.vectorize(transformer)(matrix[:, 5])
-
 #print(matrix)
 
 day_1 = np.datetime64(matrix[0][0])
@@ -165,17 +179,38 @@ quantity_of_rooms = len(fund_dict)
 numbers = [np.str_(num) for num in range(1, quantity_of_rooms + 1)]
 
 busy = {day: dict.fromkeys(numbers, 0) for day in days}
-print(busy, 'словарь состояний')
+#print(busy, 'словарь состояний')
 
-profits_per_day = {day: 0 for day in days}
-total_profits_day = 0
 total_lost_profit = 0
+profits_per_day = {day: 0 for day in days}
+dates_modeling = {matrix[0][0]: 0}
 for clt in matrix:
+    if clt[0] not in dates_modeling:
+        daily_income = 0
+        trans_date = list(dates_modeling.keys())[-1]
+        busy_rooms = busy_cnt(busy[trans_date])
+        free_rooms = len(fund_dict) - busy_rooms
+
+        print(f'Количество занятых номеров на конец {trans_date}: {busy_rooms}')
+        print(f'Количество свободных номеров на конец {trans_date}: {free_rooms}')
+        print(f'Процент загруженности гостиницы: {round(busy_rooms / len(fund_dict) * 100, 2)}%')
+        dates_modeling[clt[0]] = 0
+
+
+
+
     date_entry = clt[5]
     free_numbers = busy[date_entry]
     max_clt_cost = clt[7]       # сколько готов заплатить
     amount = int(clt[4])        # сколько мест требуется челу
-    print(free_numbers, 'до фильтров')
+    #print(free_numbers, 'до фильтров')
+
+    entry_day = np.datetime64(date_entry)
+    stay_dates = []
+    for day in range(int(clt[6])):
+        delta = np.timedelta64(day, 'D')
+        stay_dates.append(np.str_(entry_day + delta))
+
 
     entry_day = np.datetime64(date_entry)
     stay_dates = []
@@ -185,8 +220,8 @@ for clt in matrix:
 
     flag_string = 'content'
     free_numbers = future_busy(free_numbers, date_entry, clt[6])
-    print(free_numbers, 'по занятости на будущие даты')     # первый фильтр применен
-    if len(free_numbers) == 0:
+    #print(free_numbers, 'по занятости на будущие даты')     # первый фильтр применен
+    if len(free_numbers) == 0:      #!!!
         flag_string = 'empty'
 
     if flag_string == 'content':
@@ -200,15 +235,16 @@ for clt in matrix:
         if amount == 7:
             free_numbers = {}
             flag_string = 'empty'
-        print(free_numbers, 'по нужному количеству человек')        # второй фильтр применен
+        #print(free_numbers, 'по нужному количеству человек')        # второй фильтр применен
 
     if flag_string == 'content':
         free_numbers = filter_cost(free_numbers, max_clt_cost, amount)
-        print(free_numbers, 'по цене')          # третий фильтр применен
-        if len(free_numbers) == 0:
+        #print(free_numbers, 'по цене')          # третий фильтр применен
+        if len(free_numbers) == 0:      #!!! x2
             flag_string = 'empty'
 
     if flag_string == 'content':
+        # подсчитать профит (сделано, реализовал функцию profit)
         clt_profit = profit(free_numbers, max_clt_cost, amount)[1]
         room_for_clt = profit(free_numbers, max_clt_cost, amount)[0]
 
@@ -248,6 +284,13 @@ for value in profits_per_day.values():
     # после того, как все посчитали, надо изменить словарь состояний busy и можно в следующую итерацию
     # в начале цикла тоже нужно будет реализовать, чтоб "с утра" все понаехавшие съезжали
 
+    print(total_lost_profit)
+    #print(profits_per_day)
+    last_date = clt[0]
 
-
+busy_rooms = busy_cnt(busy[last_date])
+free_rooms = len(fund_dict) - busy_rooms
+print(f'Количество занятых номеров на конец {last_date}: {busy_rooms}')
+print(f'Количество свободных номеров на конец {last_date}: {free_rooms}')
+print(f'Процент загруженности гостиницы: {round(busy_rooms / len(fund_dict) * 100, 2)}%')
 
