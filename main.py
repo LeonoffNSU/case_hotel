@@ -59,8 +59,8 @@ def profit(good_rooms: dict, opportunity: np.str_, arg_amount: int):
             list_for_max.append(fund_dict[room][3])
 
         list_for_max = np.array(list_for_max)
-        with_breakfast = list_for_max + food['breakfast'] * int(clt[6])
-        with_half_board = list_for_max + food['half_board'] * int(clt[6])
+        with_breakfast = list_for_max + food['breakfast']
+        with_half_board = list_for_max + food['half_board']
         table_for_max = np.vstack([list_for_max, with_breakfast, with_half_board])
 
         potential_max = table_for_max.max()
@@ -84,8 +84,8 @@ def profit(good_rooms: dict, opportunity: np.str_, arg_amount: int):
             list_for_max.append(fund_dict[room][4])
 
         list_for_max = np.array(list_for_max)
-        with_breakfast = list_for_max + food['breakfast'] * int(clt[6])
-        with_half_board = list_for_max + food['half_board'] * int(clt[6])
+        with_breakfast = list_for_max + food['breakfast']
+        with_half_board = list_for_max + food['half_board']
         table_for_max = np.vstack([list_for_max, with_breakfast, with_half_board])
 
         potential_max = table_for_max.max()
@@ -152,6 +152,7 @@ with open('booking.txt', encoding='utf-8') as clients:
 
 matrix[:, 0] = np.vectorize(transformer)(matrix[:, 0])
 matrix[:, 5] = np.vectorize(transformer)(matrix[:, 5])
+
 #print(matrix)
 
 day_1 = np.datetime64(matrix[0][0])
@@ -164,8 +165,11 @@ quantity_of_rooms = len(fund_dict)
 numbers = [np.str_(num) for num in range(1, quantity_of_rooms + 1)]
 
 busy = {day: dict.fromkeys(numbers, 0) for day in days}
-#print(busy, 'словарь состояний')
+print(busy, 'словарь состояний')
 
+profits_per_day = {day: 0 for day in days}
+total_profits_day = 0
+total_lost_profit = 0
 for clt in matrix:
     date_entry = clt[5]
     free_numbers = busy[date_entry]
@@ -173,10 +177,16 @@ for clt in matrix:
     amount = int(clt[4])        # сколько мест требуется челу
     print(free_numbers, 'до фильтров')
 
+    entry_day = np.datetime64(date_entry)
+    stay_dates = []
+    for day in range(int(clt[6])):
+        delta = np.timedelta64(day, 'D')
+        stay_dates.append(np.str_(entry_day + delta))
+
     flag_string = 'content'
     free_numbers = future_busy(free_numbers, date_entry, clt[6])
     print(free_numbers, 'по занятости на будущие даты')     # первый фильтр применен
-    if len(free_numbers) == 0:      #!!!
+    if len(free_numbers) == 0:
         flag_string = 'empty'
 
     if flag_string == 'content':
@@ -195,23 +205,48 @@ for clt in matrix:
     if flag_string == 'content':
         free_numbers = filter_cost(free_numbers, max_clt_cost, amount)
         print(free_numbers, 'по цене')          # третий фильтр применен
-        if len(free_numbers) == 0:      #!!! x2
+        if len(free_numbers) == 0:
             flag_string = 'empty'
 
     if flag_string == 'content':
-        # подсчитать профит (сделано, реализовал функцию profit)
         clt_profit = profit(free_numbers, max_clt_cost, amount)[1]
         room_for_clt = profit(free_numbers, max_clt_cost, amount)[0]
-        print(room_for_clt, 'комната для клиента')
-        print(clt_profit, 'выручка')
+
+        if np.random.random() <= 0.25:
+            print(clt)
+            lost_profit = int(max_clt_cost) * int(clt[6]) * int(clt[4])
+        else:
+            for stay_date in stay_dates:
+                busy[stay_date][room_for_clt] = 1
+            profits_per_day[clt[0]] += clt_profit * int(clt[4]) * int(clt[6])
+
+        print(f'{clt[1]}')
+        print(f'Дата бронирования: {clt[0]}')
+        if clt[4] == '1':
+            print(f'Будет заселен {clt[4]} человек на {clt[6]} дней: {", ".join(stay_dates)}')
+        else:
+            print(f'Будут заселены {clt[4]} человека на {clt[6]} дней: {", ".join(stay_dates)}')
+        print(f'Максимальный допустимый расход на одного человека: {clt[7]}')
+
+        print(f'Комната для клиента: {room_for_clt} - {fund_dict[room_for_clt][0]} {fund_dict[room_for_clt][2]} ')
+
     else:
-        pass
-        # подсчитать убыток
+        lost_profit = int(max_clt_cost) * int(clt[6]) * int(clt[4])
+        total_lost_profit += lost_profit
+
+
+
+print(total_lost_profit)
+print(profits_per_day)
+total = 0
+for value in profits_per_day.values():
+    total += value
+
+
+
 
     # после того, как все посчитали, надо изменить словарь состояний busy и можно в следующую итерацию
     # в начале цикла тоже нужно будет реализовать, чтоб "с утра" все понаехавшие съезжали
-
-    break
 
 
 
