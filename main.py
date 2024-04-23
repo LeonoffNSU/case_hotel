@@ -1,5 +1,5 @@
 import numpy as np
-
+import ru_local as ru
 
 def transformer(bad_date):
     good_date = bad_date[-4:] + '-' + bad_date[-7:-5] + '-' + bad_date[0:2]
@@ -137,20 +137,20 @@ food = {'without': 0, 'breakfast': 280, 'half_board': 1000}
 with open('fund.txt', encoding= 'utf-8') as chrt:
     fund_dict = {}
     for line in chrt:
-        if 'одноместный' in line:
-            line = line.replace('одноместный', 'one')
-        if 'двухместный' in line:
-            line = line.replace('двухместный', 'two')
-        if 'полулюкс' in line:
-            line = line.replace('полулюкс', 'middle_luxe')
-        if 'люкс' in line:
-            line = line.replace('люкс', 'luxe')
-        if 'стандарт_улучшенный' in line:
-            line = line.replace('стандарт_улучшенный', 'improve_standart')
-        if 'стандарт' in line:
-            line = line.replace('стандарт', 'standart')
-        if 'апартамент' in line:
-            line = line.replace('апартамент', 'apartment')
+        if ru.ONE in line:
+            line = line.replace(ru.ONE, 'one')
+        if ru.TWO in line:
+            line = line.replace(ru.TWO, 'two')
+        if ru.MIDDLE in line:
+            line = line.replace(ru.MIDDLE, 'middle_luxe')
+        if ru.LUXE in line:
+            line = line.replace(ru.LUXE, 'luxe')
+        if ru.IMPROVE in line:
+            line = line.replace(ru.IMPROVE, 'improve_standart')
+        if ru.STANDART in line:
+            line = line.replace(ru.STANDART, 'standart')
+        if ru.APARTMENT in line:
+            line = line.replace(ru.APARTMENT, 'apartment')
         line = line.split()
         fund_dict[line[0]] = [line[1], int(line[2]), line[3]]
 
@@ -199,19 +199,19 @@ for clt in matrix:
         busy_rooms = busy_cnt(busy[trans_date])
         free_rooms = len(fund_dict) - busy_rooms
 
-        print(f'Количество занятых номеров на конец {trans_date}: {busy_rooms}')
-        print(f'Количество свободных номеров на конец {trans_date}: {free_rooms}')
-        print(f'Процент загруженности гостиницы: {round(busy_rooms / len(fund_dict) * 100, 2)}%')
+        print(f'{ru.BUSY_ROOMS} {trans_date}: {busy_rooms}')
+        print(f'{ru.FREE_ROOMS} {trans_date}: {free_rooms}')
+        print(f'{ru.PERCENT_HOTEL}: {round(busy_rooms / len(fund_dict) * 100, 2)}%')
 
         busy_ctg = busy_categories(busy[trans_date])
-        print(f'''Процент загруженности номеров по категориям:                                                       
-        Одноместные: {busy_ctg["one"]}%                                                                               
-        Двухместные: {busy_ctg["two"]}%                                                                               
-        Полулюкс: {busy_ctg["middle_luxe"]}%                                                                          
-        Люкс: {busy_ctg["luxe"]}%''')
+        print(f'''{ru.PERCENT_CATEGORY}:                                                       
+        {ru.ONE}: {busy_ctg["one"]}%                                                                               
+        {ru.TWO}: {busy_ctg["two"]}%                                                                               
+        {ru.MIDDLE}: {busy_ctg["middle_luxe"]}%                                                                          
+        {ru.LUXE}: {busy_ctg["luxe"]}%''')
 
-        print(f'Доход за {trans_date}: {profit_per_day[trans_date]}')
-        print(f'Упущенный доход за {trans_date}: {lost_profit_per_day[trans_date]}')
+        print(f'{ru.PROFIT} {trans_date}: {profit_per_day[trans_date]}')
+        print(f'{ru.LOST_PROFIT} {trans_date}: {lost_profit_per_day[trans_date]}')
         dates_modeling[clt[0]] = 0
 
     date_entry = clt[5]
@@ -261,7 +261,7 @@ for clt in matrix:
             lost_profit = int(max_clt_cost) * int(clt[6]) * int(clt[4])
             lost_profit_per_day[clt[0]] += lost_profit
             total_lost_profit += lost_profit
-            print(f'{clt[1]} {clt[2]} {clt[3]} отказался(-лась) от заселения')
+            print(f'{clt[1]} {clt[2]} {clt[3]} {ru.REFUSE}')
 
         else:
             for stay_date in stay_dates:
@@ -269,19 +269,19 @@ for clt in matrix:
             profit_per_day[clt[0]] += clt_profit * int(clt[4]) * int(clt[6])
 
             print(f'{clt[1]} {clt[2]} {clt[3]}')
-            print(f'Дата бронирования: {clt[0]}')
+            print(f'{ru.BOOKING_DATE}: {clt[0]}')
             if clt[4] == '1':
-                print(f'Будет заселен {clt[4]} человек на {clt[6]} дней: {", ".join(stay_dates)}')
+                print(f'{ru.CHECK_INTO} {clt[4]} {ru.PERSON} {clt[6]} {ru.DAYS}: {", ".join(stay_dates)}')
             else:
-                print(f'Будут заселены {clt[4]} человека на {clt[6]} дней: {", ".join(stay_dates)}')
-            print(f'Максимальный допустимый расход на одного человека: {clt[7]}')
-            print(f'Комната для клиента: {room_for_clt} - {fund_dict[room_for_clt][0]} {fund_dict[room_for_clt][2]}')
+                print(f'{ru.CHECK_INTO_1} {clt[4]} {ru.PEOPLE} {clt[6]} {ru.DAYS}: {", ".join(stay_dates)}')
+            print(f'{ru.MAX_AMOUNT}: {clt[7]}')
+            print(f'{ru.ROOM_FOR_CLIENT}: {room_for_clt} - {fund_dict[room_for_clt][0]} {fund_dict[room_for_clt][2]}')
 
     else:
         lost_profit = int(max_clt_cost) * int(clt[6]) * int(clt[4])
         lost_profit_per_day[clt[0]] += lost_profit
         total_lost_profit += lost_profit
-        print(f'Клиенту {clt[1]} {clt[2]} {clt[3]} не хватило мест (или денег), спрос был на номер с {clt[4]} местами')
+        print(f'{ru.CLIENT} {clt[1]} {clt[2]} {clt[3]} {ru.NO_ROOMS} {clt[4]} {ru.PLACE}')
 
     last_date = clt[0]
 
@@ -291,18 +291,18 @@ for value in profit_per_day.values():
 
 busy_rooms = busy_cnt(busy[last_date])
 free_rooms = len(fund_dict) - busy_rooms
-print(f'Количество занятых номеров на конец {last_date}: {busy_rooms}')
-print(f'Количество свободных номеров на конец {last_date}: {free_rooms}')
-print(f'Процент загруженности гостиницы: {round(busy_rooms / len(fund_dict) * 100, 2)}%')
+print(f'{ru.BUSY_ROOMS} {last_date}: {busy_rooms}')
+print(f'{ru.FREE_ROOMS} {last_date}: {free_rooms}')
+print(f'{ru.PERCENT_HOTEL}: {round(busy_rooms / len(fund_dict) * 100, 2)}%')
 
 busy_ctg = busy_categories(busy[last_date])
-print(f'''Процент загруженности номеров по категориям:                                                       
-Одноместные: {busy_ctg["one"]}%                                                                               
-Двухместные: {busy_ctg["two"]}%                                                                               
-Полулюкс: {busy_ctg["middle_luxe"]}%                                                                          
-Люкс: {busy_ctg["luxe"]}%''')
-print(f'Доход за {last_date}: {profit_per_day[last_date]}')
-print(f'Упущенный доход за {last_date}: {lost_profit_per_day[last_date]}')
+print(f'''{ru.PERCENT_CATEGORY}:                                                       
+{ru.ONE}: {busy_ctg["one"]}%                                                                               
+{ru.TWO}: {busy_ctg["two"]}%                                                                               
+{ru.MIDDLE}: {busy_ctg["middle_luxe"]}%                                                                          
+{ru.LUXE}: {busy_ctg["luxe"]}%''')
+print(f'{ru.PROFIT} {last_date}: {profit_per_day[last_date]}')
+print(f'{ru.LOST_PROFIT} {last_date}: {lost_profit_per_day[last_date]}')
 
-print(f'Общий доход: {total}')
-print(f'Общий упущенный доход: {total_lost_profit}')
+print(f'{ru.TOTAL_PROFIT}: {total}')
+print(f'{ru.TOTAL_LOST}: {total_lost_profit}')
