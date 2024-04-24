@@ -3,6 +3,14 @@ import ru_local as ru
 
 
 class Loading:
+    '''
+    The class loads data from files fund.txt and booking.txt
+    Attributes: fund_dict - dictionary with data from a file fund.txt
+    matrix - ndarray with data from a file booking.txt
+    type_room - room price dictionary
+    coefficient - coefficient dictionary
+    food - food cost dictionary
+    '''
     type_room = {'one': 2900, 'two': 2300, 'middle_luxe': 3200, 'luxe': 4100}
     coefficient = {'standart': 1, 'improve_standart': 1.2, 'apartment': 1.5}
     food = {'without': 0, 'breakfast': 280, 'half_board': 1000}
@@ -70,7 +78,7 @@ class Busy(Loading):
     The class creates a status dictionary
     Attributes: busy - A dictionary of states where the occupancy of numbers is stored
     days - Dates of the month
-    Methods: create_busy - Processes data and returns a dictionary - busy and dates
+    Methods: create_busy - Processes data and returns a dictionary (busy) and list (dates)
     '''
     def __init__(self):
         super().__init__()
@@ -92,6 +100,14 @@ class Busy(Loading):
 
 
 class Optimum(Busy):
+    '''
+    Class for determining optimal client placements
+    Attributes: objects (attribute of class) - list of class instances
+    total_lost_profit - count lost profit
+    profit_per_day - profit for each day of booking
+    lost_profit_per_day - lost profit for each day of booking
+    dates_modeling - dictionary of dates when the reservation takes place
+    '''
     objects = []
 
     def __init__(self):
@@ -104,6 +120,11 @@ class Optimum(Busy):
 
     @staticmethod
     def busy_cnt(rooms: dict):
+        '''
+        Identifies the number of occupied rooms
+        :param rooms: dictionary state of rooms on a specific date
+        :return: the number of occupied rooms
+        '''
         cnt = 0
         for room, value in rooms.items():
             if value == 1:
@@ -112,6 +133,11 @@ class Optimum(Busy):
 
     @staticmethod
     def busy_categories(rooms: dict):
+        '''
+        Identifies occupied rooms by category
+        :param rooms: dictionary state of rooms on a specific date
+        :return: dictionary of occupied rooms by category
+        '''
         busy_rooms_ctg = dict.fromkeys(['one', 'two', 'luxe', 'middle_luxe'], 0)
         free_rooms_ctg = dict.fromkeys(['one', 'two', 'luxe', 'middle_luxe'], 0)
 
@@ -129,6 +155,13 @@ class Optimum(Busy):
 
     @staticmethod
     def filter_cost(rooms: dict, opportunity: np.str_, arg_amount: int):
+        '''
+        Weeds out unsuitable rooms (criterion - cost)
+        :param rooms: dictionary state of rooms on a specific date
+        :param opportunity: price per day that a person is willing to pay
+        :param arg_amount: number of places in the room where we want to accommodate the client
+        :return: dictionary of filtered rooms
+        '''
         opportunity = int(opportunity)
         cost = {}
         if arg_amount == int(Optimum.client[4]):
@@ -145,6 +178,12 @@ class Optimum(Busy):
 
     @staticmethod
     def suitable_quantity_filter(rooms: dict, requirement: int):
+        '''
+        Weeds out unsuitable rooms (criterion - number of places in the room)
+        :param rooms: dictionary state of rooms on a specific date
+        :param requirement: number of desired places in the room
+        :return: dictionary of filtered rooms
+        '''
         output_rooms = {}
         for room in rooms:
             if Optimum.objects[-1].fund_dict[room][1] == requirement:
@@ -242,6 +281,7 @@ class Optimum(Busy):
             Optimum.client = clt
 
             if clt[0] not in self.dates_modeling:
+                daily_income = 0
                 trans_date = list(self.dates_modeling.keys())[-1]
                 busy_rooms = Optimum.busy_cnt(self.busy[trans_date])
                 free_rooms = len(self.fund_dict) - busy_rooms
