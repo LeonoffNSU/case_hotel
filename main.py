@@ -66,7 +66,12 @@ class Loading:
 
 
 class Busy(Loading):
-
+    '''
+    The class creates a status dictionary
+    Attributes: busy - A dictionary of states where the occupancy of numbers is stored
+    days - Dates of the month
+    Methods: create_busy - Processes data and returns a dictionary - busy and dates
+    '''
     def __init__(self):
         super().__init__()
         self.busy = self.create_busy()[0]
@@ -148,6 +153,12 @@ class Optimum(Busy):
 
     @staticmethod
     def future_busy(free_rooms: dict, entry_date: np.str_, amount_days: np.str_):
+        '''Weeds out unsuitable rooms (critetion - future room occupancy)
+               :param free_rooms: dictionary state of rooms on a specific date
+               :param entry_date: date of entry
+               :param amount_days: amount of days of stay
+               :return: dictionary of filtered rooms
+        '''
         entry_day = np.datetime64(entry_date)
         stay_dates = []
         for day in range(int(amount_days)):
@@ -166,6 +177,12 @@ class Optimum(Busy):
 
     @staticmethod
     def profit(good_rooms: dict, opportunity: np.str_, arg_amount: int):
+        '''Identifies the best room in terms of profit
+        :param good_rooms: dictionary of free rooms
+        :param opportunity: maximum customer price
+        :param arg_amount: number of people
+        :return tuple of the form (the best room, its cost)
+        '''
         opportunity = int(opportunity)
         rooms = []
         list_for_max = []
@@ -225,7 +242,6 @@ class Optimum(Busy):
             Optimum.client = clt
 
             if clt[0] not in self.dates_modeling:
-                daily_income = 0
                 trans_date = list(self.dates_modeling.keys())[-1]
                 busy_rooms = Optimum.busy_cnt(self.busy[trans_date])
                 free_rooms = len(self.fund_dict) - busy_rooms
