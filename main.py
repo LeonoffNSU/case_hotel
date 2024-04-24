@@ -192,11 +192,12 @@ class Optimum(Busy):
 
     @staticmethod
     def future_busy(free_rooms: dict, entry_date: np.str_, amount_days: np.str_):
-        '''Weeds out unsuitable rooms (critetion - future room occupancy)
-               :param free_rooms: dictionary state of rooms on a specific date
-               :param entry_date: date of entry
-               :param amount_days: amount of days of stay
-               :return: dictionary of filtered rooms
+        '''
+        Weeds out unsuitable rooms (critetion - future room occupancy)
+        :param free_rooms: dictionary state of rooms on a specific date
+        :param entry_date: date of entry
+        :param amount_days: amount of days of stay
+        :return: dictionary of filtered rooms
         '''
         entry_day = np.datetime64(entry_date)
         stay_dates = []
